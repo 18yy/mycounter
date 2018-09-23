@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>myCounter</title>
 </head>
+
 <body>
   <label for="qustionNum">题目个数：</label>
   <input type="text" id="qustionNum">
@@ -16,53 +18,94 @@
   <button type="button" onclick="playAll()">开始生成题目</button>
   <span id="text"></span>
   <script>
-  
-    //获得min到max范围内的随机数包括min和max
-    function getRandomNum(min,max){
-       var range = max - min;
-      return(Math.round(Math.random()*range+min));
+    //随机函数，获得min到max范围内的随机数包括min和max
+    function getRandomNum(min, max) {
+      var range = max - min;
+      return (Math.round(Math.random() * range + min));
     }
-    
-    //整数的四则运算
-    function countInt(a,b,maxNum){
-      var arry = ["+","-","*","/"];
-      var n = getRandomNum(0,3);
+
+    //求最大公约数
+    function getGCD(a, b) {
+      var temp;
+      while (b != 0) {
+        temp = a % b;
+        a = b;
+        b = temp;
+      }
+      return a;
+    }
+
+    //转化成分数的形式
+    function getFraction(a, b, gcd) {
+      if (gcd == 1) {
+        if (a > b) {
+          //最大公约数为1且分子大于分母，用真分数形式表示
+          var n = parseInt(a / b);
+          a = a % b;
+          return n + "'" + a + "/" + b;
+        } else {
+          return a + "/" + b;
+        }
+      } else {
+        a = a / gcd;
+        b = b / gcd;
+        return a + "/" + b;
+      }
+    }
+
+    //整数的随机四则运算
+    function countInt(a, b, maxNum) {
+      var arry = ["+", "-", "*", "/"];
+      var n = getRandomNum(0, 3);
       //匹配运算符
       switch (arry[n]) {
-         case "+": {
-          var sum = a + b;
-          return a + "+" + b + "=" + sum;
-          break;
-        }
-         case "-": {
-          var sum = a - b;
-          //如果是负数情况，重新随机生成数直到结果非负
-         while (sum < 0) {
-            var a = getRandomNum(1, maxNum);
-            var b = getRandomNum(1, maxNum);
-            var sum = a - b;
+        case "+":
+          {
+            var sum = a + b;
+            return a + "+" + b + "=" + sum;
+            break;
           }
-          return a + "-" + b + "=" + sum;
-          break;
-        }
-          case "*": {
-          var sum = a * b;
-          return a + "*" + b + "=" + sum;
-          break;
-        }
-        case "/": {
-          var sum = a / b;
-          return a + "÷" + b + "=" + sum;
-          break;
-        }
-      
+        case "-":
+          {
+            var sum = a - b;
+            //如果是负数情况，重新随机生成数直到结果非负
+            while (sum < 0) {
+              var a = getRandomNum(1, maxNum);
+              var b = getRandomNum(1, maxNum);
+              var sum = a - b;
+            }
+            return a + "-" + b + "=" + sum;
+            break;
+          }
+        case "*":
+          {
+            var sum = a * b;
+            return a + "*" + b + "=" + sum;
+            break;
+          }
+        case "/":
+          {
+            var sum = a / b;
+            //如果分子不能整除分母，运行getFraction函数把答案变成分数形式
+            while (a % b !== 0) {
+              var gcd = getGCD(a, b);
+              var sum2 = getFraction(a, b, gcd);
+              return a + "÷" + b + "=" + sum2;
+            }
+            return a + "÷" + b + "=" + sum;
+            break;
+          }
+
         default:
           break;
       }
     }
 
+    //分数的随机四则运算
+    
+
     //运行countInt函数
-    function playCountInt(maxNum){
+    function playCountInt(maxNum) {
       var a = getRandomNum(1, maxNum);
       var b = getRandomNum(1, maxNum);
       var sum = countInt(a, b, maxNum);
@@ -70,21 +113,22 @@
     }
 
     function playAll() {
-        //将页面清空
-        document.getElementById("text").innerHTML="";
-        //题目数目
-        var qustionNum = document.getElementById("qustionNum").value;
-         //运算范围，最大运算数字
-        var maxNum = document.getElementById("maxNum").value;
-        for (i = 1; i <= qustionNum; i++) {
-          
-          document.getElementById("text").innerHTML += ("<br>" + "第" + i + "题：");
-          
-          var answer = playCountInt(maxNum);
-         document.getElementById("text").innerHTML += (answer);
-            
+      //将页面清空
+      document.getElementById("text").innerHTML = "";
+      //题目数目
+      var qustionNum = document.getElementById("qustionNum").value;
+      //运算范围，最大运算数字
+      var maxNum = document.getElementById("maxNum").value;
+      for (i = 1; i <= qustionNum; i++) {
+
+        document.getElementById("text").innerHTML += ("<br>" + "第" + i + "题：");
+
+        var answer = playCountInt(maxNum);
+        document.getElementById("text").innerHTML += (answer);
+
       }
     }
   </script>
 </body>
+
 </html>

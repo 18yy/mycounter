@@ -36,7 +36,7 @@
     }
 
     //转化成分数的形式
-    function getFraction(a, b, gcd) {
+    function getFract(a, b, gcd) {
       if (gcd == 1) {
         if (a > b) {
           //最大公约数为1且分子大于分母，用真分数形式表示
@@ -86,10 +86,10 @@
         case "/":
           {
             var sum = a / b;
-            //如果分子不能整除分母，运行getFraction函数把答案变成分数形式
+            //如果分子不能整除分母，运行getFract函数把答案变成分数形式
             while (a % b !== 0) {
               var gcd = getGCD(a, b);
-              var sum2 = getFraction(a, b, gcd);
+              var sum2 = getFract(a, b, gcd);
               return a + "÷" + b + "=" + sum2;
             }
             return a + "÷" + b + "=" + sum;
@@ -102,7 +102,13 @@
     }
 
     //分数的随机四则运算
-    
+    // function countFract(a,b,c,d,maxNum){
+    //   var arry = ["+", "-", "*", "/"];
+    //   var n = getRandomNum(0, 3);
+
+
+    // }
+
 
     //运行countInt函数
     function playCountInt(maxNum) {

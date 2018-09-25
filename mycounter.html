@@ -24,7 +24,7 @@
       return (Math.round(Math.random() * range + min));
     }
 
-    //求最大公约数
+    /*//求最大公约数
     function getGCD(a, b) {
       var temp;
       while (b != 0) {
@@ -34,8 +34,22 @@
       }
       return a;
     }
-
-    //转化成分数的形式
+*/
+    //分数转化为真分数或整数
+    function TrueFract(molecule,denominator) {
+       if(molecule < denominator) {
+            var sum = molecule + '/' + denominator;
+        }else if(molecule % denominator == 0) {
+            var sum = molecule / denominator;
+        }else if(molecule > denominator) {
+            var FractionInt = parseInt(molecule / denominator);
+            var molecule = molecule % denominator;
+            var sum = FractionInt + '\'' + molecule + '/' + denominator;
+        }
+        return sum;
+    }
+    
+    /*//转化成分数的形式
     function getFract(a, b, gcd) {
       if (gcd == 1) {
         if (a > b) {
@@ -51,7 +65,7 @@
         b = b / gcd;
         return a + "/" + b;
       }
-    }
+    }*/
 
     //整数的随机四则运算
     function countInt(a, b, maxNum) {
@@ -80,18 +94,16 @@
         case "*":
           {
             var sum = a * b;
-            return a + "*" + b + "=" + sum;
+            return a + "x" + b + "=" + sum;
             break;
           }
         case "/":
           {
-            var sum = a / b;
-            //如果分子不能整除分母，运行getFract函数把答案变成分数形式
-            while (a % b !== 0) {
-              var gcd = getGCD(a, b);
-              var sum2 = getFract(a, b, gcd);
-              return a + "÷" + b + "=" + sum2;
-            }
+          	while(b == 0) {
+          	    var b = getRandomNum(1, maxNum);
+          	}
+          	//如果分子不能整除分母，运行getFract函数把答案变成分数形式
+            var sum = TrueFract(a,b);
             return a + "÷" + b + "=" + sum;
             break;
           }
@@ -102,19 +114,75 @@
     }
 
     //分数的随机四则运算
-    // function countFract(a,b,c,d,maxNum){
-    //   var arry = ["+", "-", "*", "/"];
-    //   var n = getRandomNum(0, 3);
+    function countFract(a,b,c,d,maxNum){
+       var arry = ["+", "-", "*", "/"];
+       var n = getRandomNum(0, 3);
+       //匹配运算符
+      switch (arry[n]) {
+        case "+":
+          {
+            var molecule = a * d + b * c;
+            var denominator = c * d;
+            var sum = TrueFract(molecule,denominator);
+            return a + "/" + c + "+" + b + "/" + d + "=" + sum;
+            break;
+          }
+        case "-":
+          {
+            var molecule = a * d - b * c;
+            //如果是负数情况，重新随机生成数直到结果非负
+            if (molecule < 0) {
+              var a = getRandomNum(1, maxNum);
+              var b = getRandomNum(1, maxNum);
+              var c = getRandomNum(1, maxNum);
+              var d = getRandomNum(1, maxNum);
+              var molecule = a * d - b * c;
+            }else if(molecule == 0) {
+            	var sum = 0;
+            }else {
+            	var denominator = c * d;
+                var sum = TrueFract(molecule,denominator);
+            }
+            return a + "/" + c + "-" + b + "/" + d + "=" + sum;
+            break;
+          }
+        case "*":
+          {
+            var molecule = a * b;
+            var denominator = c * d;
+            var sum = TrueFract(molecule,denominator);
+            return a + "/" + c + "x" + b + "/" + d + "=" + sum;
+            break;
+          }
+        case "/":
+          {
+            var molecule = a * d;
+            var denominator = c * d;
+            var sum = TrueFract(molecule,denominator);
+            return a + "/" + c + "÷" + b + "/" + d + "=" + sum;
+            break;
+          }
 
+        default:
+        break;
+      }
 
-    // }
+    }
 
 
     //运行countInt函数
     function playCountInt(maxNum) {
       var a = getRandomNum(1, maxNum);
       var b = getRandomNum(1, maxNum);
-      var sum = countInt(a, b, maxNum);
+      var c = getRandomNum(1, maxNum);
+      var d = getRandomNum(1, maxNum);
+      var IsInt = getRandomNum(0,1);
+      var operator_num = getRandomNum(1,3);
+      if(IsInt == "1") {
+      	    var sum = countInt(a, b, maxNum);
+      }else {
+            var sum = countFract(a, b, c, d, maxNum);
+      }
       return sum;
     }
 

@@ -6,22 +6,183 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>myCounter</title>
+  <style>
+    h2 {
+      text-align: center;
+      color: #666;
+      margin: 30px 0 30px 0;
+    }
+
+    body {
+      background: rgb(247, 250, 252);
+    }
+    .correctAnswer {
+      display: none;
+      padding-left: 15px;
+      color: rgb(230, 80, 80);
+    }
+
+    .wrap {
+      padding: 30px 10px;
+      margin: 20px auto;
+      width: 50%;
+      height: auto;
+      min-height: 300px;
+      background: white;
+      border: 1px solid rgb(218, 218, 218);
+      border-radius: 15px;
+    }
+
+    .choiceBox {
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .btnBox {
+      width: 100%;
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    label {
+      font-size: 13px;
+    }
+
+    input {
+      width: 30px;
+      height: 15px;
+    }
+
+    .qusBox {
+      width: 80%;
+      height: auto;
+      min-height: 10px;
+      padding: 10px 0 30px 20px;
+      margin: 0 auto;
+      background: rgb(228, 231, 235);
+      text-align: left;
+      font-size: 15px;
+      line-height: 25px;
+    }
+
+    #comment {
+      font-size: 12px;
+      padding-left: 40px;
+      padding-top: 20px;
+      color: rgb(176, 70, 70);
+    }
+  </style>
 </head>
 
 <body>
-  <label for="qustionNum">题目个数：</label>
-  <input type="text" id="qustionNum">
-  <br/>
-  <label for="maxNum">运算不超过的数字:</label>
-  <input type="text" id="maxNum">
-  <br/>
-  <button type="button" onclick="playAll()">开始生成题目</button>
-  <span id="text"></span>
+  <h2>小学生的四则运算题</h2>
+  <div class="wrap">
+    <div class="choiceBox">
+      <div>
+        <label for="qustionNum">题目个数：</label>
+        <input type="text" id="qustionNum">
+      </div>
+      <div>
+        <label for="maxNum">运算不超过的数字:</label>
+        <input type="text" id="maxNum">
+      </div>
+    </div>
+    <div class="btnBox">
+      <button type="button" onclick="playAll()">开始生成题目</button>
+      <button type="button" id="completedBtn">完成答题题目</button>
+      <button type="button" onclick="download()">下载文件</button>
+    </div>
+    <div class="qusBox">
+      <span id="myQus"></span>
+    </div>
+    <div id="comment">
+    </div>
+  </div>
   <script>
+    var arry = ["+", "-", "×", "÷"];
+    var countArry = new Array();
+
     //随机函数，获得min到max范围内的随机数包括min和max
     function getRandomNum(min, max) {
       var range = max - min;
       return (Math.round(Math.random() * range + min));
+    }
+    //随机生成问题集合
+    function randomQus(qusNum) {
+      var countArry = [qusNum];
+      var charArry = [];
+      for (var k = 0; k < qusNum; k++) {
+        countArry[k] = '';
+      }
+      for (var j = 0; j < qusNum; j++) {
+        var n = getRandomNum(1, 3); //随机获得运算符的个数
+        var numberOfCount = new Array(n + 1);
+        var CountStr;
+          for (var i = 0; i <= n; i++) {
+            var IsInt = getRandomNum(0, 1);//随机判断生成整数运算还是分数运算
+            var molecule = getRandomNum(1, 30); //30为maxNum
+            var denominator = getRandomNum(1, 30);
+            if(IsInt)
+              numberOfCount[i] = getRandomNum(1, 30); //随机获得整数数组
+            else
+              numberOfCount[i] = TrueFract(molecule,denominator);//随机获得分数数组
+          }
+        for (var i = 0; i < n; i++) {
+          var m = getRandomNum(0, 3); //随机选择运算符
+          countArry[j] += numberOfCount[i] + arry[m]; //随机数字和随机运算符拼接
+
+        }
+        countArry[j] += numberOfCount[n];
+        //计算式子，若小于0，则把存放该式子的位置清空，重新生成式子
+        var molecule = getMolecule(countIt(countArry[j]));
+        var denominator = getDenominator(countIt(countArry[j]));
+        var sum = eval(molecule/denominator);
+        if(sum < 0) {
+          countArry[j] = '';
+          j--;
+        }else
+          console.log(countIt(countArry[j]));  //结果大于等于0的式子所计算出来的答案
+      }
+      return countArry;
+    }
+    //计算式子
+    function countIt(params) {
+      //console.log(eval(params));
+      var num = params.split(/[\+\-\×\÷]/);
+      var operator = params.match(/[\+\-\×\÷]/g);
+      //先计算乘法除法
+      for (var i = 0; i < operator.length; i++) {
+        //console.log(operator[i]);
+        //获取运算符
+        var char = operator[i];
+        if (char == '×' || char == '÷') {
+          operator.splice(i, 1);
+          //获取运算符左右的数字
+          var numL = num[i];
+          num.splice(i, 1);
+          var numR = num[i];
+          num.splice(i, 1);
+          var sum = playCount(numL,numR,char);
+          num.splice(i,0,sum);
+          i--;
+        }
+      }
+      //再计算加减法
+      while (operator != false) {
+        //获取运算符
+        var char = operator[0];
+        operator.splice(0, 1);
+        //获取运算符左右的数字
+        var numL = num[0];
+        num.splice(0, 1);
+        var numR = num[0];
+        num.splice(0, 1);
+        var sum = playCount(numL,numR,char);
+        num.splice(0, 0, sum);
+      }
+      return sum;
     }
 
     //求最大公约数
@@ -34,71 +195,105 @@
       }
       return a;
     }
-    
-    //转化成分数的形式
-    function getFract(a, b, gcd) {
-      if (gcd == 1) {
-        if (a > b) {
-          //最大公约数为1且分子大于分母，用真分数形式表示
-          var n = parseInt(a / b);
-          a = a % b;
-          return n + "'" + a + "/" + b;
-        } else {
-          return a + "/" + b;
-        }
-      } else if(gcd == b) {
-      	return a/b;
-      } else {
-        a = a / gcd;
-        b = b / gcd;
-        return a + "/" + b;
-      }
-    }
 
     //把分数转化为真分数或整数
-    function TrueFract(molecule,denominator) {
-       if(molecule % denominator !== 0) {
-            var gcd = getGCD(molecule,denominator);
-            var sum = getFract(molecule,denominator,gcd);
-        }else {
-            var sum = molecule / denominator;
+    function TrueFract(molecule, denominator) {
+      if (molecule % denominator != 0) {
+        var gcd = getGCD(molecule, denominator);
+        if (gcd == 1) {
+          if (molecule > denominator) {  //带分数
+            //最大公约数为1且分子大于分母，用真分数形式表示
+            var n = parseInt(molecule / denominator);
+            molecule = molecule % denominator;
+            var sum = n + "'" + molecule + "/" + denominator;
+          }  else {   //分子小于分母的分数
+            var sum = molecule + "/" + denominator;
+          }
+        }else if(gcd == denominator) {
+          var sum = parseInt(molecule / denominator);
         }
-        return sum;
+        else {  //化简
+          molecule = molecule / gcd;
+          denominator = denominator / gcd;
+          var sum = molecule + "/" + denominator;
+        }
+      } else {    //可整除，结果为整数
+        var sum = parseInt(molecule / denominator);
+      }
+      return sum;
+    }
+    
+    //获取真分数中的分子
+    function getMolecule(n) {
+    	var str = String(n);
+    	if(str.search("/") == -1) {  //整数
+    		var molecule = n;
+    	}else if(str.search("'") == -1) {   //分子小于分母的分数
+    		var molecule = str.split("/")[0];
+    	}else {   //带分数
+        var integer = parseInt(str.split("'")[0]);
+        var fraction = str.split("'")[1];
+        var denominator = parseInt(fraction.split("/")[1]);
+        var molecule = parseInt(fraction.split("/")[0]);
+        var molecule = integer * denominator + molecule;
+    	}
+      return parseInt(molecule);
     }
 
-    //整数的随机四则运算
-    function countInt(a, b, operator, maxNum) {
+    //获取真分数中的分母
+    function getDenominator(n) {
+    	var str = String(n);
+    	if(str.search("/") == -1) {  //整数
+    		var denominator = 1;
+    	}else{   //分数
+    		var denominator = parseInt(str.split("/")[1]);
+    	}
+      return denominator;
+    }
+
+    //进行一个运算符的运算
+    function playCount(a, b, operator) {
+      //题目有可能是分数或整数，都当成分数来运算
+      var moleculeA = getMolecule(a);
+      var denominatorA = getDenominator(a);
+      var moleculeB = getMolecule(b);
+      var denominatorB = getDenominator(b);
       //匹配运算符
       switch (operator) {
         case "+":
           {
-            return a + b;
+            var molecule = moleculeA * denominatorB + moleculeB * denominatorA;
+            var denominator = denominatorA * denominatorB;
+            var sum = TrueFract(molecule, denominator);  //化为真分数或整数
+            return sum;
             break;
           }
         case "-":
           {
-            var sum = a - b;
-            //如果是负数情况，重新随机生成数直到结果非负
-            while (sum < 0) {
-              var a = getRandomNum(1, maxNum);
-              var b = getRandomNum(1, maxNum);
-              var sum = a - b;
+            var molecule = moleculeA * denominatorB - moleculeB * denominatorA;
+            //如果分子运算结果是0，则结果为0
+            if (molecule == 0) {
+              var sum = 0;
+            } else {
+              var denominator = denominatorA * denominatorB;
+              var sum = TrueFract(molecule, denominator);
             }
             return sum;
             break;
           }
-        case "x":
+        case "×":
           {
-            return a * b;
+            var molecule = moleculeA * moleculeB;
+            var denominator = denominatorA * denominatorB;
+            var sum = TrueFract(molecule, denominator);
+            return sum;
             break;
           }
         case "÷":
           {
-          	while(b == 0) {
-          	    var b = getRandomNum(1, maxNum);
-          	}
-          	//如果分子不能整除分母，运行getFract函数把答案变成分数形式
-            var sum = TrueFract(a,b);
+            var molecule = moleculeA * denominatorB;
+            var denominator = denominatorA * moleculeB;
+            var sum = TrueFract(molecule, denominator);
             return sum;
             break;
           }
@@ -106,236 +301,53 @@
         default:
           break;
       }
-    }
 
-    //分数的随机四则运算
-    function countFract(a, b, c, d, operator, maxNum){
-       //匹配运算符
-      switch (operator) {
-        case "+":
-          {
-            var molecule = a * d + b * c;
-            var denominator = c * d;
-            var TrueFractA = TrueFract(a,c);
-            var TrueFractB = TrueFract(b,d);
-            var sum = TrueFract(molecule,denominator);
-            return TrueFractA + "+" + TrueFractB + "=" + sum;
-            break;
-          }
-        case "-":
-          {
-            var molecule = a * d - b * c;
-            //如果是负数情况，重新随机生成数直到结果非负
-            while(molecule < 0) {
-              var a = getRandomNum(1, maxNum);
-              var b = getRandomNum(1, maxNum);
-              var c = getRandomNum(1, maxNum);
-              var d = getRandomNum(1, maxNum);
-              var molecule = a * d - b * c;
-            }
-            if(molecule == 0) {
-            	var sum = 0;
-            }else {
-            	var denominator = c * d;
-            	var TrueFractA = TrueFract(a,c);
-                var TrueFractB = TrueFract(b,d);
-                var sum = TrueFract(molecule,denominator);
-            }
-            return TrueFractA + "-" + TrueFractB + "=" + sum;
-            break;
-          }
-        case "x":
-          {
-            var molecule = a * b;
-            var denominator = c * d;
-            var TrueFractA = TrueFract(a,c);
-            var TrueFractB = TrueFract(b,d);
-            var sum = TrueFract(molecule,denominator);
-            return TrueFractA + "x" + TrueFractB + "=" + sum;
-            break;
-          }
-        case "÷":
-          {
-            var molecule = a * d;
-            var denominator = c * b;
-            var TrueFractA = TrueFract(a,c);
-            var TrueFractB = TrueFract(b,d);
-            var sum = TrueFract(molecule,denominator);
-            return TrueFractA + "÷" + TrueFractB + "=" + sum;
-            break;
-          }
-
-        default:
-        break;
-      }
-
-    }
-
-    function countInt2(a, b, c, operator1, operator2, maxNum) {
-        switch (operator1) {
-        case "+":
-          {
-          	if(operator2 == "x" || operator2 == "÷") {
-          	    var temp = countInt(b, c, operator2, maxNum);
-          		var sum = countInt(a, temp, operator1, maxNum);
-          		return sum;
-          	}else {
-          		var temp = countInt(a, b, operator1, maxNum);
-          		var sum = countInt(temp, c, operator2, maxNum);
-          		return sum;
-          	}
-            break;
-          }
-        case "-":
-          {
-            if(operator2 == "x" || operator2 == "÷") {
-          		var temp = countInt(b, c, operator2, maxNum);
-          		var sum = countInt(a, temp, operator1, maxNum);
-          	}else {
-          		var temp = countInt(a, b, operator1, maxNum);
-          		var sum = countInt(temp, c, operator2, maxNum);
-          	}
-            //如果是负数情况，重新随机生成数直到结果非负
-            while (sum < 0) {
-                var a = getRandomNum(1, maxNum);
-                var b = getRandomNum(1, maxNum);
-                var c = getRandomNum(1, maxNum);
-                if(operator2 == "x" || operator2 == "÷") {
-          		    var temp = countInt(b, c, operator2, maxNum);
-          		    var sum = countInt(a, temp, operator1, maxNum);
-          	    }else {
-          		    var temp = countInt(a, b, operator1, maxNum);
-          		    var sum = countInt(temp, c, operator2, maxNum);
-          	    }
-            }
-            return sum;
-            break;
-          }
-        case "x":
-          {
-          	var temp = countInt(a, b, operator1, maxNum);
-          	var sum = countInt(temp, c, operator2, maxNum);
-          	return sum;
-            break;
-          }
-        case "÷":
-          {
-            var temp = countInt(a, b, operator1, maxNum);
-          	var sum = countInt(temp, c, operator2, maxNum);
-          	return sum;
-            break;
-          }
-
-        default:
-        break;
-      }
-    }
-
-    function countInt3(a, b, c, d, operator1, operator2, operator3, maxNum) {
-        switch (operator1) {
-        case "+":
-          {
-          	var temp = countInt2(b, c, d, operator2, operator3, maxNum);
-          	var sum = countInt(a, temp, operator1, maxNum);
-          	return sum;
-            break;
-          }
-        case "-":
-          {
-            var temp = countInt2(b, c, d, operator2, operator3, maxNum);
-          	var sum = countInt(a, temp, operator1, maxNum);
-          	//如果是负数情况，重新随机生成数直到结果非负
-            while (sum < 0) {
-              var a = getRandomNum(1, maxNum);
-              var b = getRandomNum(1, maxNum);
-              var c = getRandomNum(1, maxNum);
-              var temp = countInt2(b, c, d, operator2, operator3, maxNum);
-          	  var sum = countInt(a, temp, operator1, maxNum);
-            }
-            return sum;
-            break;
-          }
-        case "x":
-          {
-          	var temp = countInt(a, b, operator1, maxNum);
-          	var sum = countInt2(temp, c, d, operator2, operator3, maxNum);
-          	return sum;
-            break;
-          }
-        case "÷":
-          {
-            var temp = countInt(a, b, operator1, maxNum);
-          	var sum = countInt2(temp, c, d, operator2, operator3, maxNum);
-          	return sum;
-            break;
-          }
-
-        default:
-        break;
-      }
-    }
-
-    //运行countInt函数
-    function playCountInt(maxNum) {
-        var arry = ["+", "-", "x", "÷"];
-        var num = [];
-        var operator1 = arry[getRandomNum(0, 3)];
-        var operator2 = arry[getRandomNum(0, 3)];
-        var operator3 = arry[getRandomNum(0, 3)];
-        for(var i=0;i<8;i++) {
-        	num[i] = getRandomNum(1, maxNum);
-        }
-        /*var a = getRandomNum(1, maxNum);
-        var b = getRandomNum(1, maxNum);
-        var c = getRandomNum(1, maxNum);
-        var d = getRandomNum(1, maxNum);
-        var e = getRandomNum(1, maxNum);
-        var f = getRandomNum(1, maxNum);
-        var g = getRandomNum(1, maxNum);
-        var h = getRandomNum(1, maxNum);*/
-        var IsInt = getRandomNum(0,1);
-        var operator_num = getRandomNum(1,3);
-        if(IsInt == 1) {
-        switch(operator_num) {
-            case 1: 
-            {
-                var sum = countInt(num[0], num[1], operator1, maxNum);
-                var result = num[0] + operator1 + num[1] + "=" + sum;
-                break;
-            }
-            case 2:
-            {
-                var sum = countInt2(num[0], num[1], num[2], operator1, operator2, maxNum);
-                var result = num[0] + operator1 + num[1] + operator2 + num[2] + "=" + sum;
-                break;
-            }
-            case 3:
-            {
-                var sum = countInt3(num[0], num[1], num[2], num[3], operator1, operator2, operator3, maxNum);
-                var result = num[0] + operator1 + num[1] + operator2 + num[2] + operator2 + num[3] + "=" + sum;
-                break;
-            }
-        }
-    }else 
-        var result = countFract(num[0], num[1], num[2], num[3], operator1, maxNum);
-      return result;
     }
 
     function playAll() {
-      //将页面清空
-      document.getElementById("text").innerHTML = "";
-      //题目数目
-      var qustionNum = document.getElementById("qustionNum").value;
-      //运算范围，最大运算数字
-      var maxNum = document.getElementById("maxNum").value;
-      for (i = 1; i <= qustionNum; i++) {
+      var a = randomQus(5);
+      console.log(a);
+    }
 
-        document.getElementById("text").innerHTML += ("<br>" + "第" + i + "题：");
+    //下载文件
+    function download() {
+      downloadQ();
+      downloadA();
+      downloadR();
+    }
 
-        var answer = playCountInt(maxNum);
-        document.getElementById("text").innerHTML += (answer);
-
-      }
+    //下载问题
+    function downloadQ(){
+      var element = document.createElement('a');
+      var text = ["Hello, world!","222"];
+      var filename = "Exercises.txt";
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute('download', filename);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+    }
+    //下载答案
+    function downloadA() {
+      var element = document.createElement('a');
+      var text = {1:"Hello, world!",2:"222"};
+      var filename = "Answers.txt";
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute('download', filename);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+    }
+    //下载结果
+    function downloadR(){
+      var element = document.createElement('a');
+      var text = "Hello, world!";
+      var filename = "Grade.txt";
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute('download', filename);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
     }
   </script>
 </body>

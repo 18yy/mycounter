@@ -1,0 +1,67 @@
+ h2 {
+      text-align: center;
+      color: #666;
+      margin: 30px 0 30px 0;
+    }
+
+    body {
+      background: rgb(247, 250, 252);
+    }
+
+    .correctAnswer {
+      display: none;
+      padding-left: 15px;
+      color: rgb(230, 80, 80);
+    }
+
+    .wrap {
+      padding: 30px 10px;
+      margin: 20px auto;
+      width: 50%;
+      height: auto;
+      min-height: 300px;
+      background: white;
+      border: 1px solid rgb(218, 218, 218);
+      border-radius: 15px;
+    }
+
+    .choiceBox {
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .btnBox {
+      width: 100%;
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    label {
+      font-size: 13px;
+    }
+
+    input {
+      width: 30px;
+      height: 15px;
+    }
+
+    .qusBox {
+      width: 80%;
+      height: auto;
+      min-height: 10px;
+      padding: 10px 0 30px 20px;
+      margin: 0 auto;
+      background: rgb(228, 231, 235);
+      text-align: left;
+      font-size: 15px;
+      line-height: 25px;
+    }
+
+    #comment {
+      font-size: 12px;
+      padding-left: 40px;
+      padding-top: 20px;
+      color: rgb(176, 70, 70);
+    }

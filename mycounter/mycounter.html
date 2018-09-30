@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/mycounter.css">
+  <title>myCounter</title>
+</head>
+
+<body>
+  <h2>小学生的四则运算题</h2>
+  <div class="wrap">
+    <div class="choiceBox">
+      <div>
+        <label for="qustionNum">题目个数：</label>
+        <input type="text" id="qustionNum">
+      </div>
+      <div>
+        <label for="maxNum">运算不超过的数字:</label>
+        <input type="text" id="maxNum">
+      </div>
+    </div>
+    <div class="btnBox">
+      <button type="button" onclick="playAll()">开始生成题目</button>
+      <button type="button" id="completedBtn">完成答题题目</button>
+      <button type="button" onclick="download()">下载文件</button>
+    </div>
+    <div class="qusBox">
+      <span id="myQus"></span>
+    </div>
+    <div id="comment">
+    </div>
+  </div>
+  <script src="./js/mycounter.js"></script>
+</body>
+
+</html>

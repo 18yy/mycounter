@@ -112,13 +112,11 @@ function TrueFract(molecule, denominator) {
         //分子小于分母的分数
         var sum = molecule + '/' + denominator
       }
-    } else if (gcd == denominator) {
-      var sum = parseInt(molecule / denominator)
-    } else {
-      //化简
+    }else {
+      //约分
       molecule = molecule / gcd
       denominator = denominator / gcd
-      var sum = parseInt(molecule / denominator)
+      var sum = TrueFract(molecule, denominator)
     }
   } else {
     //可整除，结果为整数
